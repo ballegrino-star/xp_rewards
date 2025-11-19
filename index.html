@@ -4,11 +4,14 @@
   <meta charset="UTF-8" />
   <title>Class XP 3D Dashboard</title>
 
-  <!-- Load Google Fonts -->
+  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Load Model Viewer -->
+  <!-- Model Viewer -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <!-- PapaParse for CSV → JSON -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
     body {
@@ -22,12 +25,23 @@
     }
 
     /* Left panel – Student list */
-    #studentList {
+    #studentListPanel {
       width: 300px;
       background: #1f2937;
       padding: 20px;
       overflow-y: auto;
       border-right: 2px solid #374151;
+      box-sizing: border-box;
+    }
+
+    #studentListTitle {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    #studentList {
+      margin-top: 8px;
     }
 
     .student-pill {
@@ -47,17 +61,27 @@
     }
 
     .student-name {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
     }
 
-    /* Main area */
+    .student-pill img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    /* Right side – Main panel */
     #mainPanel {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
       padding: 20px;
       overflow-y: auto;
+      box-sizing: border-box;
     }
 
     /* 3D avatar window */
@@ -82,11 +106,24 @@
       padding: 20px;
       border-radius: 15px;
       line-height: 1.6;
+      border: 1px solid #374151;
+    }
+
+    #infoName {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
     .label {
       font-weight: 600;
       color: #93c5fd;
+    }
+
+    #statusMessage {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-top: 6px;
     }
   </style>
 </head>
@@ -94,7 +131,11 @@
 <body>
 
   <!-- LEFT SIDE: STUDENT LIST -->
-  <div id="studentList"></div>
+  <div id="studentListPanel">
+    <div id="studentListTitle">XP Leaderboard</div>
+    <div id="statusMessage">Loading data from Google Sheets…</div>
+    <div id="studentList"></div>
+  </div>
 
   <!-- RIGHT SIDE: MAIN PANEL -->
   <div id="mainPanel">
@@ -125,26 +166,56 @@
   </div>
 
   <script>
-    /* ---------------------------------------------
-       STUDENT DATA — PUT YOUR READY PLAYER ME LINKS HERE
-       --------------------------------------------- */
+    // 🔗 1. PASTE YOUR GOOGLE SHEET CSV URL HERE
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1o8qpN_KHAVcEhV6fV6245RXPCxk-MMWKHgz434kbTSc/export?format=csv"; // e.g. "https://docs.google.com/spreadsheets/d/XXXX/export?format=csv"
 
-    const students = [
-      {
-        name: "Test Student",
-        tier: "Unranked",
-        xp: 0,
-        paAvg: 0,
-        notes: "Ready Player Me avatar test.",
-        modelPath: "https://models.readyplayer.me/691cc0bc132e61458c2ac4f2.glb",
-        avatar2d: "https://models.readyplayer.me/691cc0bc132e61458c2ac4f2.png"
-      }
-    ];
+    let students = [];
 
-    /* ---------------------------------------------
-       RENDER STUDENT LIST
-       --------------------------------------------- */
+    // Load data from Google Sheets CSV using PapaParse
+    function loadStudentsFromSheet() {
+      Papa.parse(SHEET_CSV_URL, {
+        download: true,
+        header: true,
+        complete: function(results) {
+          const rows = results.data || [];
 
+          // Filter out empty rows
+          students = rows
+            .filter(r => r.Name && r.Name.trim() !== "")
+            .map(r => ({
+              name: r.Name.trim(),
+              tier: (r.Tier || "Unranked").trim(),
+              xp: Number(r.XP || 0),
+              paAvg: Number(r.PA_Avg || 0),
+              notes: r.Notes || "",
+              modelPath: (r.GLB_URL || "").trim(),
+              avatar2d: (r.PNG_URL || "").trim()
+            }));
+
+          if (students.length === 0) {
+            document.getElementById("statusMessage").textContent =
+              "No student rows found. Check your sheet headers and data.";
+          } else {
+            document.getElementById("statusMessage").textContent =
+              "Loaded " + students.length + " students from Google Sheets.";
+          }
+
+          renderStudentList();
+
+          // Optionally auto-select the first student
+          if (students.length > 0) {
+            loadStudent(0);
+          }
+        },
+        error: function(err) {
+          console.error("Error loading sheet:", err);
+          document.getElementById("statusMessage").textContent =
+            "Error loading data. Check that the sheet is shared as 'Anyone with the link can view'.";
+        }
+      });
+    }
+
+    // Render the student list on the left
     function renderStudentList() {
       const list = document.getElementById("studentList");
       list.innerHTML = "";
@@ -157,11 +228,7 @@
         if (student.avatar2d) {
           const img = document.createElement("img");
           img.src = student.avatar2d;
-          img.style.width = "28px";
-          img.style.height = "28px";
-          img.style.borderRadius = "50%";
-          img.style.objectFit = "cover";
-          img.style.marginRight = "10px";
+          img.alt = student.name + " avatar";
           el.appendChild(img);
         }
 
@@ -175,27 +242,23 @@
       });
     }
 
-    /* ---------------------------------------------
-       LOAD STUDENT INTO VIEWER + INFO PANEL
-       --------------------------------------------- */
-
+    // When a student is clicked, load them into the 3D viewer + info panel
     function loadStudent(i) {
       const s = students[i];
 
-      // 3D Avatar
       const viewer = document.getElementById("avatarViewer");
-      viewer.src = s.modelPath;
+      viewer.src = s.modelPath || "";
 
-      // Info panel
       document.getElementById("infoName").textContent = s.name;
       document.getElementById("infoTier").textContent = s.tier;
-      document.getElementById("infoXP").textContent = s.xp;
-      document.getElementById("infoPA").textContent = s.paAvg;
-      document.getElementById("infoNotes").textContent = s.notes;
+      document.getElementById("infoXP").textContent = isNaN(s.xp) ? "—" : s.xp;
+      document.getElementById("infoPA").textContent = isNaN(s.paAvg) ? "—" : s.paAvg.toFixed(1);
+      document.getElementById("infoNotes").textContent = s.notes || "—";
     }
 
-    // Initialize the list
-    renderStudentList();
+    // Kick it off
+    loadStudentsFromSheet();
   </script>
 </body>
 </html>
+
