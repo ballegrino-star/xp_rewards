@@ -15,48 +15,99 @@
 
   <style>
     :root {
-      --bg: #111827;
-      --panel: #1f2937;
-      --border: #374151;
-      --pill: #374151;
-      --pill-hover: #4b5563;
+      --bg: #020617;
+      --panel: #020617;
+      --panel-soft: #020617;
+      --border: #1f2937;
+      --pill: #020617;
+      --pill-hover: #020617;
       --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      display: flex;
       height: 100vh;
       font-family: "Inter", sans-serif;
-      background: var(--bg);
-      color: white;
+      background: radial-gradient(circle at top, #1e293b, #020617 60%);
+      color: #e5e7eb;
       overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
     }
 
-    /* Left panel – Student list */
-    #studentListPanel {
-      width: 320px;
-      background: var(--panel);
-      padding: 20px;
-      overflow-y: auto;
-      border-right: 2px solid var(--border);
-      box-sizing: border-box;
+    .app-shell {
+      width: 100%;
+      max-width: 1400px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); /* Leaderboard bigger */
+      gap: 16px;
     }
 
-    #studentListTitle {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 4px;
+    /* Shared panel styling */
+    .panel {
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.95), rgba(15,23,42,0.96));
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
-    #statusMessage {
-      font-size: 13px;
-      color: var(--text-muted);
+    .panel-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
       margin-bottom: 10px;
     }
 
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+
+    .panel-subtitle {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    .badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: #9ca3af;
+      background: rgba(15,23,42,0.9);
+    }
+
+    /* LEFT: Leaderboard */
+    #studentListPanel {
+      overflow: hidden;
+    }
+
+    #statusMessage {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
     #studentList {
-      margin-top: 6px;
+      margin-top: 4px;
+      padding-right: 4px;
+      overflow-y: auto;
+      flex: 1;
     }
 
     .student-pill {
@@ -69,12 +120,12 @@
       align-items: center;
       justify-content: space-between;
       border: 1px solid transparent;
-      background: var(--pill);
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.95), rgba(15,23,42,0.98));
     }
 
     .student-pill:hover {
-      background: var(--pill-hover);
       transform: translateX(3px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.6);
     }
 
     .student-main {
@@ -85,11 +136,12 @@
     }
 
     .student-pill img {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(148,163,184,0.4);
     }
 
     .student-text-block {
@@ -99,7 +151,7 @@
     }
 
     .student-name-line {
-      font-size: 14px;
+      font-size: 0.9rem;
       font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
@@ -107,94 +159,115 @@
     }
 
     .student-tier-line {
-      font-size: 11px;
+      font-size: 0.72rem;
       color: var(--text-muted);
     }
 
     .student-xp {
-      font-size: 12px;
+      font-size: 0.8rem;
       font-weight: 600;
       opacity: 0.9;
       margin-left: 8px;
       white-space: nowrap;
       flex-shrink: 0;
+      color: #e5e7eb;
     }
 
     /* Tier color glows */
     .tier-S {
       border-color: rgba(56, 189, 248, 0.9);
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
-      background: radial-gradient(circle at top left, rgba(59,130,246,0.35), #0f172a);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+      background: radial-gradient(circle at top left, rgba(59,130,246,0.35), rgba(15,23,42,0.98));
     }
 
     .tier-A {
       border-color: rgba(250, 204, 21, 0.9);
-      box-shadow: 0 0 8px rgba(250, 204, 21, 0.6);
-      background: radial-gradient(circle at top left, rgba(248,250,252,0.18), #111827);
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
+      background: radial-gradient(circle at top left, rgba(250,204,21,0.25), rgba(15,23,42,0.98));
     }
 
     .tier-B {
       border-color: rgba(148,163,184, 0.9);
-      box-shadow: 0 0 6px rgba(148,163,184, 0.6);
-      background: radial-gradient(circle at top left, rgba(148,163,184,0.25), #111827);
+      box-shadow: 0 0 8px rgba(148,163,184, 0.6);
+      background: radial-gradient(circle at top left, rgba(148,163,184,0.25), rgba(15,23,42,0.98));
     }
 
     .tier-C {
       border-color: rgba(251, 146, 60, 0.9);
-      box-shadow: 0 0 6px rgba(251, 146, 60, 0.5);
-      background: radial-gradient(circle at top left, rgba(251, 146, 60,0.3), #111827);
+      box-shadow: 0 0 8px rgba(251, 146, 60, 0.6);
+      background: radial-gradient(circle at top left, rgba(251,146,60,0.3), rgba(15,23,42,0.98));
     }
 
     .tier-D {
       border-color: rgba(31,41,55, 0.9);
       box-shadow: none;
-      background: var(--pill);
     }
 
-    /* Right side – Main panel */
-    #mainPanel {
-      flex-grow: 1;
+    /* RIGHT: Avatar + Info – stacked */
+    #rightPanel {
       display: flex;
       flex-direction: column;
-      padding: 20px;
-      overflow-y: auto;
-      box-sizing: border-box;
+      gap: 12px;
+      min-height: 0;
     }
 
-    /* 3D avatar window */
+    /* Smaller avatar window */
     #avatarContainer {
       width: 100%;
-      height: 400px;
-      background: #000000;
-      border-radius: 15px;
+      height: 220px; /* smaller avatar */
+      background: radial-gradient(circle at top, rgba(15,23,42,1), #020617);
+      border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 20px;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(148,163,184,0.4);
+      position: relative;
     }
 
     model-viewer {
       width: 100%;
       height: 100%;
-      background-color: #000;
+      background-color: #020617;
     }
 
-    /* Info card */
+    .viewer-overlay {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.7rem;
+    }
+
+    .viewer-tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.85);
+      border: 1px solid rgba(148,163,184,0.4);
+      color: #e5e7eb;
+    }
+
+    /* Info card now has more room */
     #infoCard {
-      background: var(--panel);
-      padding: 20px;
-      border-radius: 15px;
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
+      padding: 14px 14px 14px;
+      border-radius: 16px;
       line-height: 1.6;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(148,163,184,0.35);
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: flex-start;
+      min-height: 0;
     }
 
     #infoName {
-      font-size: 22px;
+      font-size: 1.15rem;
       font-weight: 700;
       margin-bottom: 4px;
     }
 
     #infoTierLine {
-      font-size: 14px;
+      font-size: 0.8rem;
       color: var(--text-muted);
       margin-bottom: 10px;
     }
@@ -202,21 +275,58 @@
     .label {
       font-weight: 600;
       color: #93c5fd;
+      font-size: 0.8rem;
     }
 
-    @media (max-width: 900px) {
+    #infoXP, #infoPA {
+      font-size: 0.9rem;
+    }
+
+    #infoNotes {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+    }
+
+    .info-secondary {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .stat-chip {
+      padding: 5px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.4);
+      margin-bottom: 6px;
+    }
+
+    .stat-chip strong {
+      color: #e5e7eb;
+    }
+
+    @media (max-width: 960px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
       body {
-        flex-direction: column;
+        overflow-y: auto;
+      }
+      #avatarContainer {
+        height: 260px;
+      }
+      #infoCard {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        padding: 10px;
       }
       #studentListPanel {
-        width: 100%;
-        border-right: none;
-        border-bottom: 2px solid var(--border);
-        display: flex;
-        flex-direction: column;
-      }
-      #mainPanel {
-        height: 100%;
+        max-height: 50vh;
       }
     }
   </style>
@@ -224,48 +334,73 @@
 
 <body>
 
-  <!-- LEFT SIDE: STUDENT LIST -->
-  <div id="studentListPanel">
-    <div id="studentListTitle">XP Leaderboard</div>
-    <div id="statusMessage">Loading data from Google Sheets…</div>
-    <div id="studentList"></div>
-  </div>
+  <div class="app-shell">
+    <!-- LEFT: LEADERBOARD -->
+    <div id="studentListPanel" class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">XP Leaderboard</div>
+          <div class="panel-subtitle">Click a student to view their avatar & stats</div>
+        </div>
+        <div class="badge">Live from Google Sheets</div>
+      </div>
 
-  <!-- RIGHT SIDE: MAIN PANEL -->
-  <div id="mainPanel">
-
-    <!-- 3D AVATAR VIEWER -->
-    <div id="avatarContainer">
-      <model-viewer id="avatarViewer"
-        src=""
-        alt="Student Avatar"
-        camera-controls
-        auto-rotate
-        rotation-per-second="30deg"
-        environment-image="neutral"
-        exposure="1"
-        shadow-intensity="1">
-      </model-viewer>
+      <div id="statusMessage">Loading data from Google Sheets…</div>
+      <div id="studentList"></div>
     </div>
 
-    <!-- INFO PANEL -->
-    <div id="infoCard">
-      <h2 id="infoName">Select a student</h2>
-      <div id="infoTierLine">Tier: —</div>
-      <p><span class="label">XP:</span> <span id="infoXP">—</span></p>
-      <p><span class="label">PA Avg:</span> <span id="infoPA">—</span></p>
-      <p><span class="label">Notes:</span> <span id="infoNotes">—</span></p>
-    </div>
+    <!-- RIGHT: AVATAR + INFO -->
+    <div id="rightPanel" class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Player Profile</div>
+        <div class="badge">Ready Player Me 3D</div>
+      </div>
 
+      <!-- Smaller 3D AVATAR VIEWER -->
+      <div id="avatarContainer">
+        <model-viewer id="avatarViewer"
+          src=""
+          alt="Student Avatar"
+          camera-controls
+          auto-rotate
+          rotation-per-second="30deg"
+          environment-image="neutral"
+          exposure="1"
+          shadow-intensity="1">
+        </model-viewer>
+        <div class="viewer-overlay">
+          <div id="viewerNameTag" class="viewer-tag">Select a student</div>
+          <div id="viewerTierTag" class="viewer-tag">Tier: —</div>
+        </div>
+      </div>
+
+      <!-- INFO PANEL -->
+      <div id="infoCard">
+        <div>
+          <h2 id="infoName">No student selected</h2>
+          <div id="infoTierLine">Tier: —</div>
+          <p><span class="label">XP:</span> <span id="infoXP">—</span></p>
+          <p><span class="label">PA Avg:</span> <span id="infoPA">—</span></p>
+          <p><span class="label">Notes:</span> <span id="infoNotes">Select a student from the leaderboard to see details.</span></p>
+        </div>
+        <div>
+          <div id="statTier" class="stat-chip">Tier: —</div>
+          <div id="statMeta" class="stat-chip">Rank: —</div>
+          <div id="statExtra" class="info-secondary">
+            Use this space for notes like “On-task streak”, “Big PA gains”, or “Needs binder work”.
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    // 🔗 1. YOUR GOOGLE SHEET CSV URL
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1l2Z9nHuDViwBzIx5MpktL0GrOYQzHoN4e6L_ORFHGM0/export?format=csv";
+    // 🔗 Your Google Sheet CSV URL (already working)
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1o8qpN_KHAVcEhV6fV6245RXPCxk-MMWKHgz434kbTSc/export?format=csv";
 
     let students = [];
 
-    // Helper: map Tier → emoji + CSS class + label
+    // Map Tier → emoji + CSS class + label
     function getTierMeta(rawTier) {
       const t = (rawTier || "").toString().trim().toUpperCase();
 
@@ -343,7 +478,7 @@
               "Loaded " + students.length + " students from Google Sheets.";
           }
 
-          // Sort by XP descending (optional, but useful)
+          // Sort by XP descending
           students.sort((a, b) => (b.xp || 0) - (a.xp || 0));
 
           renderStudentList();
@@ -418,11 +553,19 @@
       const viewer = document.getElementById("avatarViewer");
       viewer.src = s.modelPath || "";
 
+      document.getElementById("viewerNameTag").textContent = s.name;
+      document.getElementById("viewerTierTag").textContent = `Tier: ${meta.tier}`;
+
       document.getElementById("infoName").textContent = `${meta.emoji} ${s.name}`;
       document.getElementById("infoTierLine").textContent = `Tier: ${meta.label}`;
       document.getElementById("infoXP").textContent = isNaN(s.xp) ? "—" : s.xp;
       document.getElementById("infoPA").textContent = isNaN(s.paAvg) ? "—" : s.paAvg.toFixed(1);
       document.getElementById("infoNotes").textContent = s.notes || "—";
+
+      document.getElementById("statTier").innerHTML = `<strong>Tier:</strong> ${meta.label}`;
+      document.getElementById("statMeta").innerHTML = `<strong>XP Rank:</strong> #${i + 1} on leaderboard`;
+      document.getElementById("statExtra").textContent =
+        "Use this for quick teacher notes or to highlight their latest achievement.";
     }
 
     // Kick it off
