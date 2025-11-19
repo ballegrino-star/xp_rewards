@@ -22,8 +22,6 @@
       --pill-hover: #111827;
       --text-muted: #9ca3af;
       --accent: #3b82f6;
-      --xp-bar-bg: #020617;
-      --xp-bar-fill: #22c55e;
     }
 
     * {
@@ -42,7 +40,7 @@
       overflow: hidden;
     }
 
-    /* Left panel – Student list */
+    /* Left panel – Student list (bigger) */
     #studentListPanel {
       border-right: 1px solid var(--border);
       padding: 16px 18px;
@@ -73,8 +71,8 @@
       cursor: pointer;
       transition: 0.18s;
       display: flex;
-      flex-direction: column;
-      gap: 6px;
+      align-items: flex-start;
+      gap: 10px;
       border: 1px solid transparent;
       background: var(--pill);
     }
@@ -89,11 +87,11 @@
       outline-offset: 1px;
     }
 
-    .student-row-top {
+    .student-left {
+      flex: 1;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      flex-direction: column;
+      gap: 4px;
       min-width: 0;
     }
 
@@ -137,24 +135,30 @@
       opacity: 0.9;
       white-space: nowrap;
       flex-shrink: 0;
-      text-align: right;
+      margin-top: 4px;
     }
 
-    /* XP progress bar */
-    .xp-bar-wrapper {
-      width: 100%;
+    .xp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .xp-bar-container {
+      flex: 1;
       height: 6px;
       border-radius: 999px;
-      background: var(--xp-bar-bg);
+      background: #020617;
       overflow: hidden;
-      border: 1px solid rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.4);
     }
 
     .xp-bar-fill {
       height: 100%;
-      width: 0;
       border-radius: 999px;
-      background: linear-gradient(90deg, #22c55e, #a3e635);
+      background: linear-gradient(to right, #22c55e, #3b82f6);
+      width: 0%;
       transition: width 0.3s ease-out;
     }
 
@@ -189,11 +193,11 @@
       background: var(--pill);
     }
 
-    /* Right side – Info + Avatar */
+    /* Right side – Info + larger avatar */
     #mainPanel {
       padding: 16px 18px;
       display: grid;
-      grid-template-rows: minmax(0, 1fr) minmax(0, 1.2fr); /* bigger avatar */
+      grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.3fr); /* more space to avatar */
       gap: 12px;
       overflow: hidden;
     }
@@ -207,7 +211,7 @@
       line-height: 1.6;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       overflow: hidden;
     }
 
@@ -223,12 +227,14 @@
     #infoTierLine {
       font-size: 13px;
       color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
     #infoStatsRow {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 4px;
     }
 
     .info-chip {
@@ -244,10 +250,10 @@
       color: #93c5fd;
     }
 
-    /* Avatar viewer – bottom, larger now */
+    /* Avatar viewer – larger preview */
     #avatarContainer {
       width: 100%;
-      height: 300px;
+      height: 320px; /* larger */
       background: #000000;
       border-radius: 16px;
       overflow: hidden;
@@ -281,14 +287,14 @@
 
 <body>
 
-  <!-- LEFT: XP Leaderboard -->
+  <!-- LEFT: LEADERBOARD -->
   <div id="studentListPanel">
     <div id="studentListTitle">XP Leaderboard</div>
     <div id="statusMessage">Loading data from Google Sheets…</div>
     <div id="studentList"></div>
   </div>
 
-  <!-- RIGHT: Info (top) + Avatar (bottom) -->
+  <!-- RIGHT: INFO + AVATAR -->
   <div id="mainPanel">
 
     <!-- INFO PANEL -->
@@ -297,7 +303,9 @@
       <div id="infoTierLine">Tier: —</div>
 
       <div id="infoStatsRow">
-        <div class="info-chip"><span class="label">XP:</span> <span id="infoXP">—</span></div>
+        <div class="info-chip">
+          <span class="label">XP:</span> <span id="infoXP">—</span>
+        </div>
       </div>
     </div>
 
@@ -318,12 +326,12 @@
   </div>
 
   <script>
-    // Your Google Sheet CSV URL (already working)
+    // Your Google Sheet CSV URL
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1l2Z9nHuDViwBzIx5MpktL0GrOYQzHoN4e6L_ORFHGM0/export?format=csv";
 
     let students = [];
     let activeIndex = null;
-    let maxXP = 1; // used for progress bar scaling
+    let maxXp = 0;
 
     // Map Tier → emoji + CSS class + label
     function getTierMeta(rawTier) {
@@ -404,10 +412,11 @@
           // Sort by XP descending
           students.sort((a, b) => (b.xp || 0) - (a.xp || 0));
 
-          // Compute max XP for progress bar scaling
-          const xpValues = students.map(s => s.xp || 0);
-          const maxFound = Math.max(...xpValues, 0);
-          maxXP = maxFound > 0 ? maxFound : 1;
+          // Determine max XP for progress bars
+          maxXp = students.reduce((max, s) => {
+            const val = isNaN(s.xp) ? 0 : s.xp;
+            return val > max ? val : max;
+          }, 0);
 
           renderStudentList();
 
@@ -440,9 +449,9 @@
           loadStudent(index);
         };
 
-        // Top row: avatar + name/tier + XP text
-        const rowTop = document.createElement("div");
-        rowTop.className = "student-row-top";
+        // Left side (avatar + name/tier + bar)
+        const left = document.createElement("div");
+        left.className = "student-left";
 
         const mainDiv = document.createElement("div");
         mainDiv.className = "student-main";
@@ -468,28 +477,38 @@
         textBlock.appendChild(nameLine);
         textBlock.appendChild(tierLine);
         mainDiv.appendChild(textBlock);
+        left.appendChild(mainDiv);
 
-        rowTop.appendChild(mainDiv);
+        // XP row: bar + XP text
+        const xpRow = document.createElement("div");
+        xpRow.className = "xp-row";
 
-        const xpSpan = document.createElement("div");
-        xpSpan.className = "student-xp";
-        xpSpan.textContent = `${isNaN(student.xp) ? 0 : student.xp} XP`;
-        rowTop.appendChild(xpSpan);
-
-        pill.appendChild(rowTop);
-
-        // XP progress bar row
-        const barWrapper = document.createElement("div");
-        barWrapper.className = "xp-bar-wrapper";
+        const barContainer = document.createElement("div");
+        barContainer.className = "xp-bar-container";
 
         const barFill = document.createElement("div");
         barFill.className = "xp-bar-fill";
 
-        const percent = Math.max(0, Math.min(100, (student.xp || 0) / maxXP * 100));
-        barFill.style.width = percent.toFixed(1) + "%";
+        const xpValue = isNaN(student.xp) ? 0 : student.xp;
+        let pct = 0;
+        if (maxXp > 0) {
+          pct = (xpValue / maxXp) * 100;
+          if (pct > 100) pct = 100;
+          // Small floor for visibility if they have >0 XP
+          if (xpValue > 0 && pct < 8) pct = 8;
+        }
+        barFill.style.width = pct + "%";
 
-        barWrapper.appendChild(barFill);
-        pill.appendChild(barWrapper);
+        barContainer.appendChild(barFill);
+        xpRow.appendChild(barContainer);
+
+        const xpSpan = document.createElement("div");
+        xpSpan.className = "student-xp";
+        xpSpan.textContent = `${xpValue} XP`;
+        xpRow.appendChild(xpSpan);
+
+        left.appendChild(xpRow);
+        pill.appendChild(left);
 
         list.appendChild(pill);
       });
@@ -508,7 +527,7 @@
       document.getElementById("infoTierLine").textContent = `Tier: ${meta.label}`;
       document.getElementById("infoXP").textContent = isNaN(s.xp) ? "—" : s.xp;
 
-      renderStudentList(); // re-render to update active highlight & bars
+      renderStudentList(); // re-render to update active highlight + bars
     }
 
     // Kick it off
