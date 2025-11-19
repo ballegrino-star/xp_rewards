@@ -258,7 +258,7 @@
 
       students.forEach((student, index) => {
         const el = document.createElement("div");
-        el.className = "student-pill";
+        el.className = "student-pill tier-" + student.tier;
 
         // Avatar icon if available
         if (student.avatar2d) {
@@ -271,8 +271,17 @@
       const nameSpan = document.createElement("span");
 nameSpan.className = "student-name";
 
-// Show name + XP
-nameSpan.textContent = `${student.name}  (${student.xp} XP)`;
+// Tier badge mapping
+const badges = {
+  "S": "💎🔥",
+  "A": "🏅✨",
+  "B": "🥈⭐",
+  "C": "🥉",
+  "D": "⚫"
+};
+// Tier Badge + Name + XP
+
+nameSpan.textContent = `${badges[student.tier] || ""} ${student.name}  (${student.xp} XP)`;
 
         el.appendChild(nameSpan);
         el.onclick = () => loadStudent(index);
