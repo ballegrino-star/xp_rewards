@@ -21,7 +21,6 @@
       --pill: #0f172a;
       --pill-hover: #111827;
       --text-muted: #9ca3af;
-      --accent: #3b82f6;
     }
 
     * {
@@ -33,15 +32,14 @@
       height: 100vh;
       font-family: "Inter", sans-serif;
       background: radial-gradient(circle at top, #1e293b, #020617 55%);
-      color: white;
-      display: grid;
-      grid-template-columns: 1.4fr 1.6fr; /* leaderboard bigger */
-      gap: 0;
+      color: #f9fafb;
+      display: flex;
       overflow: hidden;
     }
 
-    /* Left panel – Student list (bigger) */
+    /* LEFT: XP Leaderboard */
     #studentListPanel {
+      width: 380px;
       border-right: 1px solid var(--border);
       padding: 16px 18px;
       overflow-y: auto;
@@ -71,8 +69,8 @@
       cursor: pointer;
       transition: 0.18s;
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      flex-direction: column;
+      gap: 6px;
       border: 1px solid transparent;
       background: var(--pill);
     }
@@ -85,14 +83,6 @@
     .student-pill.active {
       outline: 2px solid rgba(59,130,246,0.7);
       outline-offset: 1px;
-    }
-
-    .student-left {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
     }
 
     .student-main {
@@ -129,19 +119,9 @@
       color: var(--text-muted);
     }
 
-    .student-xp {
-      font-size: 12px;
-      font-weight: 600;
-      opacity: 0.9;
-      white-space: nowrap;
-      flex-shrink: 0;
-      margin-top: 4px;
-    }
-
     .xp-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 8px;
     }
 
@@ -160,6 +140,13 @@
       background: linear-gradient(to right, #22c55e, #3b82f6);
       width: 0%;
       transition: width 0.3s ease-out;
+    }
+
+    .student-xp {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     /* Tier color glows */
@@ -193,32 +180,47 @@
       background: var(--pill);
     }
 
-    /* Right side – Info + larger avatar */
+    /* RIGHT: Hero viewer + info */
     #mainPanel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       padding: 16px 18px;
-      display: grid;
-      grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.3fr); /* more space to avatar */
-      gap: 12px;
+      gap: 14px;
       overflow: hidden;
     }
 
-    /* Info card – top */
+    /* Hero 3D model viewer */
+    #avatarContainer {
+      flex: 0 0 380px; /* hero size */
+      background: #000;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      background-color: #020617;
+    }
+
+    /* Info card below */
     #infoCard {
+      flex: 1;
       background: radial-gradient(circle at top left, rgba(59,130,246,0.22), rgba(15,23,42,0.98));
       padding: 14px 16px;
       border-radius: 16px;
       border: 1px solid rgba(30,64,175,0.7);
-      line-height: 1.6;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 10px;
       overflow: hidden;
     }
 
     #infoName {
       font-size: 22px;
       font-weight: 700;
-      margin-bottom: 2px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -227,14 +229,12 @@
     #infoTierLine {
       font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 6px;
     }
 
     #infoStatsRow {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 4px;
     }
 
     .info-chip {
@@ -250,36 +250,43 @@
       color: #93c5fd;
     }
 
-    /* Avatar viewer – larger preview */
-    #avatarContainer {
-      width: 100%;
-      height: 320px; /* larger */
-      background: #000000;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
+    #infoRewardsRow {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    model-viewer {
-      width: 100%;
-      height: 100%;
-      background-color: #020617;
+    #infoRewards {
+      font-size: 13px;
+      color: #e5e7eb;
+      background: rgba(15,23,42,0.9);
+      border-radius: 10px;
+      padding: 8px 10px;
+      border: 1px solid rgba(51,65,85,0.9);
+      max-height: 80px;
+      overflow-y: auto;
+      white-space: pre-line; /* allow line breaks from sheet */
     }
 
     @media (max-width: 900px) {
       body {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
+        flex-direction: column;
         height: auto;
       }
+
       #studentListPanel {
+        width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--border);
         height: 260px;
       }
+
       #mainPanel {
-        grid-template-rows: auto auto;
         height: calc(100vh - 260px);
+      }
+
+      #avatarContainer {
+        flex: 0 0 260px;
       }
     }
   </style>
@@ -294,24 +301,13 @@
     <div id="studentList"></div>
   </div>
 
-  <!-- RIGHT: INFO + AVATAR -->
+  <!-- RIGHT: HERO VIEWER + INFO -->
   <div id="mainPanel">
 
-    <!-- INFO PANEL -->
-    <div id="infoCard">
-      <div id="infoName">Select a student</div>
-      <div id="infoTierLine">Tier: —</div>
-
-      <div id="infoStatsRow">
-        <div class="info-chip">
-          <span class="label">XP:</span> <span id="infoXP">—</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3D AVATAR VIEWER -->
+    <!-- HERO 3D AVATAR VIEWER -->
     <div id="avatarContainer">
-      <model-viewer id="avatarViewer"
+      <model-viewer
+        id="avatarViewer"
         src=""
         alt="Student Avatar"
         camera-controls
@@ -323,11 +319,29 @@
       </model-viewer>
     </div>
 
+    <!-- INFO PANEL -->
+    <div id="infoCard">
+      <div id="infoName">Select a student</div>
+      <div id="infoTierLine">Tier: —</div>
+
+      <div id="infoStatsRow">
+        <div class="info-chip">
+          <span class="label">XP:</span> <span id="infoXP">—</span>
+        </div>
+      </div>
+
+      <div id="infoRewardsRow">
+        <div class="label" style="font-size: 12px;">Rewards</div>
+        <div id="infoRewards">—</div>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    // Your Google Sheet CSV URL
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1l2Z9nHuDViwBzIx5MpktL0GrOYQzHoN4e6L_ORFHGM0/export?format=csv";
+    // Google Sheet CSV URL
+    const SHEET_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/1l2Z9nHuDViwBzIx5MpktL0GrOYQzHoN4e6L_ORFHGM0/export?format=csv";
 
     let students = [];
     let activeIndex = null;
@@ -339,56 +353,25 @@
 
       switch (t) {
         case "S":
-          return {
-            tier: "S",
-            emoji: "💎🔥",
-            label: "Diamond S-tier",
-            css: "tier-S"
-          };
+          return { tier: "S", emoji: "💎🔥", label: "Diamond S-tier", css: "tier-S" };
         case "A":
-          return {
-            tier: "A",
-            emoji: "🏅✨",
-            label: "Gold A-tier",
-            css: "tier-A"
-          };
+          return { tier: "A", emoji: "🏅✨", label: "Gold A-tier", css: "tier-A" };
         case "B":
-          return {
-            tier: "B",
-            emoji: "🥈⭐",
-            label: "Silver B-tier",
-            css: "tier-B"
-          };
+          return { tier: "B", emoji: "🥈⭐", label: "Silver B-tier", css: "tier-B" };
         case "C":
-          return {
-            tier: "C",
-            emoji: "🥉",
-            label: "Bronze C-tier",
-            css: "tier-C"
-          };
+          return { tier: "C", emoji: "🥉", label: "Bronze C-tier", css: "tier-C" };
         case "D":
-          return {
-            tier: "D",
-            emoji: "⬛",
-            label: "Tier D",
-            css: "tier-D"
-          };
+          return { tier: "D", emoji: "⬛", label: "Tier D", css: "tier-D" };
         default:
-          return {
-            tier: t || "Unranked",
-            emoji: "⬛",
-            label: t || "Unranked",
-            css: "tier-D"
-          };
+          return { tier: t || "Unranked", emoji: "⬛", label: t || "Unranked", css: "tier-D" };
       }
     }
 
-    // Load data from Google Sheets via PapaParse
     function loadStudentsFromSheet() {
       Papa.parse(SHEET_CSV_URL, {
         download: true,
         header: true,
-        complete: function(results) {
+        complete: function (results) {
           const rows = results.data || [];
 
           students = rows
@@ -397,22 +380,24 @@
               name: r.Name.trim(),
               tier: (r.Tier || "Unranked").trim(),
               xp: Number(r.XP || 0),
+              rewards: (r.Rewards || "").trim(),           // <-- NEW
               modelPath: (r.GLB_URL || "").trim(),
               avatar2d: (r.PNG_URL || "").trim()
             }));
 
-          if (students.length === 0) {
+          if (!students.length) {
             document.getElementById("statusMessage").textContent =
               "No student rows found. Check your sheet headers and data.";
-          } else {
-            document.getElementById("statusMessage").textContent =
-              "Loaded " + students.length + " students from Google Sheets.";
+            return;
           }
+
+          document.getElementById("statusMessage").textContent =
+            "Loaded " + students.length + " students from Google Sheets.";
 
           // Sort by XP descending
           students.sort((a, b) => (b.xp || 0) - (a.xp || 0));
 
-          // Determine max XP for progress bars
+          // Max XP for progress bars
           maxXp = students.reduce((max, s) => {
             const val = isNaN(s.xp) ? 0 : s.xp;
             return val > max ? val : max;
@@ -420,19 +405,17 @@
 
           renderStudentList();
 
-          if (students.length > 0) {
-            loadStudent(0);
-          }
+          // Auto-select top student
+          loadStudent(0);
         },
-        error: function(err) {
+        error: function (err) {
           console.error("Error loading sheet:", err);
           document.getElementById("statusMessage").textContent =
-            "Error loading data. Check that the sheet is shared as 'Anyone with the link can view'.";
+            "Error loading data. Make sure the sheet is shared as 'Anyone with the link can view'.";
         }
       });
     }
 
-    // Render the student list with XP bars
     function renderStudentList() {
       const list = document.getElementById("studentList");
       list.innerHTML = "";
@@ -441,26 +424,19 @@
         const meta = getTierMeta(student.tier);
         const pill = document.createElement("div");
         pill.className = "student-pill " + meta.css;
-        if (index === activeIndex) {
-          pill.classList.add("active");
-        }
+        if (index === activeIndex) pill.classList.add("active");
 
-        pill.onclick = () => {
-          loadStudent(index);
-        };
+        pill.onclick = () => loadStudent(index);
 
-        // Left side (avatar + name/tier + bar)
-        const left = document.createElement("div");
-        left.className = "student-left";
-
-        const mainDiv = document.createElement("div");
-        mainDiv.className = "student-main";
+        // Top row: avatar + name + tier
+        const mainRow = document.createElement("div");
+        mainRow.className = "student-main";
 
         if (student.avatar2d) {
           const img = document.createElement("img");
           img.src = student.avatar2d;
           img.alt = student.name + " avatar";
-          mainDiv.appendChild(img);
+          mainRow.appendChild(img);
         }
 
         const textBlock = document.createElement("div");
@@ -476,10 +452,11 @@
 
         textBlock.appendChild(nameLine);
         textBlock.appendChild(tierLine);
-        mainDiv.appendChild(textBlock);
-        left.appendChild(mainDiv);
+        mainRow.appendChild(textBlock);
 
-        // XP row: bar + XP text
+        pill.appendChild(mainRow);
+
+        // Bottom row: XP bar + value
         const xpRow = document.createElement("div");
         xpRow.className = "xp-row";
 
@@ -494,8 +471,7 @@
         if (maxXp > 0) {
           pct = (xpValue / maxXp) * 100;
           if (pct > 100) pct = 100;
-          // Small floor for visibility if they have >0 XP
-          if (xpValue > 0 && pct < 8) pct = 8;
+          if (xpValue > 0 && pct < 8) pct = 8; // min visible bar
         }
         barFill.style.width = pct + "%";
 
@@ -507,30 +483,32 @@
         xpSpan.textContent = `${xpValue} XP`;
         xpRow.appendChild(xpSpan);
 
-        left.appendChild(xpRow);
-        pill.appendChild(left);
+        pill.appendChild(xpRow);
 
         list.appendChild(pill);
       });
     }
 
-    // Load a student into the info panel + 3D viewer
-    function loadStudent(i) {
-      activeIndex = i;
-      const s = students[i];
+    function loadStudent(index) {
+      activeIndex = index;
+      const s = students[index];
       const meta = getTierMeta(s.tier);
 
+      // Update hero viewer
       const viewer = document.getElementById("avatarViewer");
       viewer.src = s.modelPath || "";
 
+      // Update info card
       document.getElementById("infoName").textContent = `${meta.emoji} ${s.name}`;
       document.getElementById("infoTierLine").textContent = `Tier: ${meta.label}`;
       document.getElementById("infoXP").textContent = isNaN(s.xp) ? "—" : s.xp;
+      document.getElementById("infoRewards").textContent = s.rewards || "—";
 
-      renderStudentList(); // re-render to update active highlight + bars
+      // Update left highlight + bars
+      renderStudentList();
     }
 
-    // Kick it off
+    // Init
     loadStudentsFromSheet();
   </script>
 </body>
