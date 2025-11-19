@@ -15,12 +15,11 @@
 
   <style>
     :root {
-      --bg: #020617;
-      --panel: #020617;
-      --panel-soft: #020617;
-      --border: #1f2937;
-      --pill: #020617;
-      --pill-hover: #020617;
+      --bg: #111827;
+      --panel: #1f2937;
+      --border: #374151;
+      --pill: #1f2937;
+      --pill-hover: #111827;
       --text-muted: #9ca3af;
     }
 
@@ -30,83 +29,41 @@
 
     body {
       margin: 0;
+      display: flex;
       height: 100vh;
       font-family: "Inter", sans-serif;
       background: radial-gradient(circle at top, #1e293b, #020617 60%);
       color: #e5e7eb;
       overflow: hidden;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
     }
 
-    .app-shell {
-      width: 100%;
-      max-width: 1400px;
+    /* LEFT PANEL – LEADERBOARD (bigger now) */
+    #studentListPanel {
+      width: 420px;              /* wider leaderboard */
+      background: var(--panel);
       padding: 16px;
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); /* Leaderboard bigger */
-      gap: 16px;
-    }
-
-    /* Shared panel styling */
-    .panel {
-      background: radial-gradient(circle at top left, rgba(15,23,42,0.95), rgba(15,23,42,0.96));
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,0.35);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
-      padding: 16px 16px 14px;
+      border-right: 2px solid var(--border);
       display: flex;
       flex-direction: column;
-      min-height: 0;
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .panel-title {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #9ca3af;
-    }
-
-    .panel-subtitle {
-      font-size: 0.75rem;
-      color: #6b7280;
-    }
-
-    .badge {
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      border: 1px solid rgba(148,163,184,0.4);
-      color: #9ca3af;
-      background: rgba(15,23,42,0.9);
-    }
-
-    /* LEFT: Leaderboard */
-    #studentListPanel {
       overflow: hidden;
     }
 
+    #studentListTitle {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
     #statusMessage {
-      font-size: 0.75rem;
+      font-size: 13px;
       color: var(--text-muted);
       margin-bottom: 8px;
     }
 
     #studentList {
       margin-top: 4px;
-      padding-right: 4px;
       overflow-y: auto;
+      padding-right: 4px;
       flex: 1;
     }
 
@@ -120,12 +77,13 @@
       align-items: center;
       justify-content: space-between;
       border: 1px solid transparent;
-      background: radial-gradient(circle at top left, rgba(15,23,42,0.95), rgba(15,23,42,0.98));
+      background: var(--pill);
     }
 
     .student-pill:hover {
+      background: var(--pill-hover);
       transform: translateX(3px);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
     }
 
     .student-main {
@@ -136,8 +94,8 @@
     }
 
     .student-pill img {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
@@ -151,7 +109,7 @@
     }
 
     .student-name-line {
-      font-size: 0.9rem;
+      font-size: 14px;
       font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
@@ -159,12 +117,12 @@
     }
 
     .student-tier-line {
-      font-size: 0.72rem;
+      font-size: 11px;
       color: var(--text-muted);
     }
 
     .student-xp {
-      font-size: 0.8rem;
+      font-size: 12px;
       font-weight: 600;
       opacity: 0.9;
       margin-left: 8px;
@@ -173,29 +131,29 @@
       color: #e5e7eb;
     }
 
-    /* Tier color glows */
+    /* Tier glows */
     .tier-S {
       border-color: rgba(56, 189, 248, 0.9);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
-      background: radial-gradient(circle at top left, rgba(59,130,246,0.35), rgba(15,23,42,0.98));
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+      background: radial-gradient(circle at top left, rgba(59,130,246,0.35), #020617);
     }
 
     .tier-A {
       border-color: rgba(250, 204, 21, 0.9);
-      box-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
-      background: radial-gradient(circle at top left, rgba(250,204,21,0.25), rgba(15,23,42,0.98));
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.7);
+      background: radial-gradient(circle at top left, rgba(250,204,21,0.25), #020617);
     }
 
     .tier-B {
       border-color: rgba(148,163,184, 0.9);
-      box-shadow: 0 0 8px rgba(148,163,184, 0.6);
-      background: radial-gradient(circle at top left, rgba(148,163,184,0.25), rgba(15,23,42,0.98));
+      box-shadow: 0 0 8px rgba(148,163,184, 0.7);
+      background: radial-gradient(circle at top left, rgba(148,163,184,0.25), #020617);
     }
 
     .tier-C {
       border-color: rgba(251, 146, 60, 0.9);
-      box-shadow: 0 0 8px rgba(251, 146, 60, 0.6);
-      background: radial-gradient(circle at top left, rgba(251,146,60,0.3), rgba(15,23,42,0.98));
+      box-shadow: 0 0 8px rgba(251, 146, 60, 0.7);
+      background: radial-gradient(circle at top left, rgba(251,146,60,0.3), #020617);
     }
 
     .tier-D {
@@ -203,22 +161,25 @@
       box-shadow: none;
     }
 
-    /* RIGHT: Avatar + Info – stacked */
-    #rightPanel {
+    /* RIGHT PANEL – AVATAR + INFO */
+    #mainPanel {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      min-height: 0;
+      padding: 16px;
+      background: #020617;
+      overflow: hidden;
     }
 
     /* Smaller avatar window */
     #avatarContainer {
       width: 100%;
-      height: 220px; /* smaller avatar */
-      background: radial-gradient(circle at top, rgba(15,23,42,1), #020617);
+      height: 230px;          /* smaller avatar */
+      background: radial-gradient(circle at top, #020617, #000);
       border-radius: 16px;
       overflow: hidden;
-      border: 1px solid rgba(148,163,184,0.4);
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
       position: relative;
     }
 
@@ -235,7 +196,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      font-size: 0.7rem;
+      font-size: 11px;
     }
 
     .viewer-tag {
@@ -246,56 +207,52 @@
       color: #e5e7eb;
     }
 
-    /* Info card now has more room */
+    /* Info card */
     #infoCard {
-      background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
-      padding: 14px 14px 14px;
+      background: var(--panel);
+      padding: 14px;
       border-radius: 16px;
-      line-height: 1.6;
-      border: 1px solid rgba(148,163,184,0.35);
+      border: 1px solid var(--border);
       display: grid;
       grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
       gap: 12px;
       align-items: flex-start;
+      overflow-y: auto;
+      flex: 1;
       min-height: 0;
     }
 
     #infoName {
-      font-size: 1.15rem;
+      font-size: 20px;
       font-weight: 700;
       margin-bottom: 4px;
     }
 
     #infoTierLine {
-      font-size: 0.8rem;
+      font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .label {
       font-weight: 600;
       color: #93c5fd;
-      font-size: 0.8rem;
+      font-size: 13px;
     }
 
     #infoXP, #infoPA {
-      font-size: 0.9rem;
+      font-size: 14px;
     }
 
     #infoNotes {
-      font-size: 0.8rem;
+      font-size: 13px;
       color: #e5e7eb;
-    }
-
-    .info-secondary {
-      font-size: 0.78rem;
-      color: var(--text-muted);
     }
 
     .stat-chip {
       padding: 5px 8px;
       border-radius: 10px;
-      font-size: 0.75rem;
+      font-size: 12px;
       background: rgba(15,23,42,0.9);
       border: 1px solid rgba(148,163,184,0.4);
       margin-bottom: 6px;
@@ -305,28 +262,26 @@
       color: #e5e7eb;
     }
 
-    @media (max-width: 960px) {
-      .app-shell {
-        grid-template-columns: 1fr;
+    .info-secondary {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
         height: auto;
       }
-      body {
-        overflow-y: auto;
+      #studentListPanel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid var(--border);
       }
-      #avatarContainer {
-        height: 260px;
+      #mainPanel {
+        height: auto;
       }
       #infoCard {
         grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .app-shell {
-        padding: 10px;
-      }
-      #studentListPanel {
-        max-height: 50vh;
       }
     }
   </style>
@@ -334,70 +289,54 @@
 
 <body>
 
-  <div class="app-shell">
-    <!-- LEFT: LEADERBOARD -->
-    <div id="studentListPanel" class="panel">
-      <div class="panel-header">
-        <div>
-          <div class="panel-title">XP Leaderboard</div>
-          <div class="panel-subtitle">Click a student to view their avatar & stats</div>
-        </div>
-        <div class="badge">Live from Google Sheets</div>
-      </div>
+  <!-- LEFT: LEADERBOARD -->
+  <div id="studentListPanel">
+    <div id="studentListTitle">XP Leaderboard</div>
+    <div id="statusMessage">Loading data from Google Sheets…</div>
+    <div id="studentList"></div>
+  </div>
 
-      <div id="statusMessage">Loading data from Google Sheets…</div>
-      <div id="studentList"></div>
+  <!-- RIGHT: AVATAR + INFO -->
+  <div id="mainPanel">
+    <div id="avatarContainer">
+      <model-viewer id="avatarViewer"
+        src=""
+        alt="Student Avatar"
+        camera-controls
+        auto-rotate
+        rotation-per-second="30deg"
+        environment-image="neutral"
+        exposure="1"
+        shadow-intensity="1">
+      </model-viewer>
+
+      <div class="viewer-overlay">
+        <div id="viewerNameTag" class="viewer-tag">Select a student</div>
+        <div id="viewerTierTag" class="viewer-tag">Tier: —</div>
+      </div>
     </div>
 
-    <!-- RIGHT: AVATAR + INFO -->
-    <div id="rightPanel" class="panel">
-      <div class="panel-header">
-        <div class="panel-title">Player Profile</div>
-        <div class="badge">Ready Player Me 3D</div>
+    <div id="infoCard">
+      <div>
+        <h2 id="infoName">No student selected</h2>
+        <div id="infoTierLine">Tier: —</div>
+        <p><span class="label">XP:</span> <span id="infoXP">—</span></p>
+        <p><span class="label">PA Avg:</span> <span id="infoPA">—</span></p>
+        <p><span class="label">Notes:</span> <span id="infoNotes">Select a student from the leaderboard to see details.</span></p>
       </div>
-
-      <!-- Smaller 3D AVATAR VIEWER -->
-      <div id="avatarContainer">
-        <model-viewer id="avatarViewer"
-          src=""
-          alt="Student Avatar"
-          camera-controls
-          auto-rotate
-          rotation-per-second="30deg"
-          environment-image="neutral"
-          exposure="1"
-          shadow-intensity="1">
-        </model-viewer>
-        <div class="viewer-overlay">
-          <div id="viewerNameTag" class="viewer-tag">Select a student</div>
-          <div id="viewerTierTag" class="viewer-tag">Tier: —</div>
-        </div>
-      </div>
-
-      <!-- INFO PANEL -->
-      <div id="infoCard">
-        <div>
-          <h2 id="infoName">No student selected</h2>
-          <div id="infoTierLine">Tier: —</div>
-          <p><span class="label">XP:</span> <span id="infoXP">—</span></p>
-          <p><span class="label">PA Avg:</span> <span id="infoPA">—</span></p>
-          <p><span class="label">Notes:</span> <span id="infoNotes">Select a student from the leaderboard to see details.</span></p>
-        </div>
-        <div>
-          <div id="statTier" class="stat-chip">Tier: —</div>
-          <div id="statMeta" class="stat-chip">Rank: —</div>
-          <div id="statExtra" class="info-secondary">
-            Use this space for notes like “On-task streak”, “Big PA gains”, or “Needs binder work”.
-          </div>
+      <div>
+        <div id="statTier" class="stat-chip">Tier: —</div>
+        <div id="statMeta" class="stat-chip">XP Rank: —</div>
+        <div id="statExtra" class="info-secondary">
+          Use this for quick teacher notes or to highlight their latest achievement.
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // 🔗 Your Google Sheet CSV URL (already working)
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1l2Z9nHuDViwBzIx5MpktL0GrOYQzHoN4e6L_ORFHGM0/export?format=csv
-";
+    // 🔗 Your Google Sheet CSV URL (same as before)
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1l2Z9nHuDViwBzIx5MpktL0GrOYQzHoN4e6L_ORFHGM0/export?format=csv";
 
     let students = [];
 
@@ -546,7 +485,7 @@
       });
     }
 
-    // When a student is clicked, load them into the 3D viewer + info panel
+    // When a student is clicked, load into 3D viewer + info panel
     function loadStudent(i) {
       const s = students[i];
       const meta = getTierMeta(s.tier);
