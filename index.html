@@ -14,91 +14,74 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
+    :root {
+      --bg: #111827;
+      --panel: #1f2937;
+      --border: #374151;
+      --pill: #374151;
+      --pill-hover: #4b5563;
+      --text-muted: #9ca3af;
+    }
+
     body {
       margin: 0;
       display: flex;
       height: 100vh;
       font-family: "Inter", sans-serif;
-      background: #111827;
+      background: var(--bg);
       color: white;
       overflow: hidden;
     }
-/* Tier color classes */
-.tier-S {
-  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
-  color: #ffffff;
-  border-left: 6px solid #7dd3fc;
-}
-
-.tier-A {
-  background: linear-gradient(90deg, #fbbf24, #f59e0b);
-  color: #ffffff;
-  border-left: 6px solid #fcd34d;
-}
-
-.tier-B {
-  background: linear-gradient(90deg, #e5e7eb, #d1d5db);
-  color: #111827;
-  border-left: 6px solid #f3f4f6;
-}
-
-.tier-C {
-  background: linear-gradient(90deg, #d97706, #b45309);
-  color: #ffffff;
-  border-left: 6px solid #fbbf24;
-}
-
-.tier-D {
-  background: #4b5563;
-  color: #f3f4f6;
-  border-left: 6px solid #6b7280;
-}
-
-/* Hover effect preserved */
-.student-pill:hover {
-  transform: translateX(4px);
-  opacity: 0.95;
-}
 
     /* Left panel – Student list */
     #studentListPanel {
-      width: 300px;
-      background: #1f2937;
+      width: 320px;
+      background: var(--panel);
       padding: 20px;
       overflow-y: auto;
-      border-right: 2px solid #374151;
+      border-right: 2px solid var(--border);
       box-sizing: border-box;
     }
 
     #studentListTitle {
       font-size: 18px;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
+    }
+
+    #statusMessage {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
     }
 
     #studentList {
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .student-pill {
-      background: #374151;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border-radius: 999px;
       cursor: pointer;
-      transition: 0.25s;
+      transition: 0.18s;
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      border: 1px solid transparent;
+      background: var(--pill);
     }
 
     .student-pill:hover {
-      background: #4b5563;
-      transform: translateX(4px);
+      background: var(--pill-hover);
+      transform: translateX(3px);
     }
 
-    .student-name {
-      font-size: 15px;
-      font-weight: 600;
+    .student-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
     }
 
     .student-pill img {
@@ -106,8 +89,66 @@
       height: 28px;
       border-radius: 50%;
       object-fit: cover;
-      margin-right: 10px;
       flex-shrink: 0;
+    }
+
+    .student-text-block {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .student-name-line {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .student-tier-line {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .student-xp {
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0.9;
+      margin-left: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Tier color glows */
+    .tier-S {
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+      background: radial-gradient(circle at top left, rgba(59,130,246,0.35), #0f172a);
+    }
+
+    .tier-A {
+      border-color: rgba(250, 204, 21, 0.9);
+      box-shadow: 0 0 8px rgba(250, 204, 21, 0.6);
+      background: radial-gradient(circle at top left, rgba(248,250,252,0.18), #111827);
+    }
+
+    .tier-B {
+      border-color: rgba(148,163,184, 0.9);
+      box-shadow: 0 0 6px rgba(148,163,184, 0.6);
+      background: radial-gradient(circle at top left, rgba(148,163,184,0.25), #111827);
+    }
+
+    .tier-C {
+      border-color: rgba(251, 146, 60, 0.9);
+      box-shadow: 0 0 6px rgba(251, 146, 60, 0.5);
+      background: radial-gradient(circle at top left, rgba(251, 146, 60,0.3), #111827);
+    }
+
+    .tier-D {
+      border-color: rgba(31,41,55, 0.9);
+      box-shadow: none;
+      background: var(--pill);
     }
 
     /* Right side – Main panel */
@@ -128,6 +169,7 @@
       border-radius: 15px;
       overflow: hidden;
       margin-bottom: 20px;
+      border: 1px solid var(--border);
     }
 
     model-viewer {
@@ -138,17 +180,23 @@
 
     /* Info card */
     #infoCard {
-      background: #1f2937;
+      background: var(--panel);
       padding: 20px;
       border-radius: 15px;
       line-height: 1.6;
-      border: 1px solid #374151;
+      border: 1px solid var(--border);
     }
 
     #infoName {
       font-size: 22px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+    }
+
+    #infoTierLine {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
     }
 
     .label {
@@ -156,10 +204,20 @@
       color: #93c5fd;
     }
 
-    #statusMessage {
-      font-size: 13px;
-      color: #9ca3af;
-      margin-top: 6px;
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+      #studentListPanel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+        display: flex;
+        flex-direction: column;
+      }
+      #mainPanel {
+        height: 100%;
+      }
     }
   </style>
 </head>
@@ -193,7 +251,7 @@
     <!-- INFO PANEL -->
     <div id="infoCard">
       <h2 id="infoName">Select a student</h2>
-      <p><span class="label">Tier:</span> <span id="infoTier">—</span></p>
+      <div id="infoTierLine">Tier: —</div>
       <p><span class="label">XP:</span> <span id="infoXP">—</span></p>
       <p><span class="label">PA Avg:</span> <span id="infoPA">—</span></p>
       <p><span class="label">Notes:</span> <span id="infoNotes">—</span></p>
@@ -202,10 +260,60 @@
   </div>
 
   <script>
-    // 🔗 1. PASTE YOUR GOOGLE SHEET CSV URL HERE
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1l2Z9nHuDViwBzIx5MpktL0GrOYQzHoN4e6L_ORFHGM0/export?format=csv"; // e.g. "https://docs.google.com/spreadsheets/d/XXXX/export?format=csv"
+    // 🔗 1. YOUR GOOGLE SHEET CSV URL
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1l2Z9nHuDViwBzIx5MpktL0GrOYQzHoN4e6L_ORFHGM0/export?format=csv";
 
     let students = [];
+
+    // Helper: map Tier → emoji + CSS class + label
+    function getTierMeta(rawTier) {
+      const t = (rawTier || "").toString().trim().toUpperCase();
+
+      switch (t) {
+        case "S":
+          return {
+            tier: "S",
+            emoji: "💎🔥",
+            label: "Diamond S-tier",
+            css: "tier-S"
+          };
+        case "A":
+          return {
+            tier: "A",
+            emoji: "🏅✨",
+            label: "Gold A-tier",
+            css: "tier-A"
+          };
+        case "B":
+          return {
+            tier: "B",
+            emoji: "🥈⭐",
+            label: "Silver B-tier",
+            css: "tier-B"
+          };
+        case "C":
+          return {
+            tier: "C",
+            emoji: "🥉",
+            label: "Bronze C-tier",
+            css: "tier-C"
+          };
+        case "D":
+          return {
+            tier: "D",
+            emoji: "⬛",
+            label: "Tier D",
+            css: "tier-D"
+          };
+        default:
+          return {
+            tier: t || "Unranked",
+            emoji: "⬛",
+            label: t || "Unranked",
+            css: "tier-D"
+          };
+      }
+    }
 
     // Load data from Google Sheets CSV using PapaParse
     function loadStudentsFromSheet() {
@@ -215,7 +323,6 @@
         complete: function(results) {
           const rows = results.data || [];
 
-          // Filter out empty rows
           students = rows
             .filter(r => r.Name && r.Name.trim() !== "")
             .map(r => ({
@@ -236,9 +343,11 @@
               "Loaded " + students.length + " students from Google Sheets.";
           }
 
+          // Sort by XP descending (optional, but useful)
+          students.sort((a, b) => (b.xp || 0) - (a.xp || 0));
+
           renderStudentList();
 
-          // Optionally auto-select the first student
           if (students.length > 0) {
             loadStudent(0);
           }
@@ -257,47 +366,60 @@
       list.innerHTML = "";
 
       students.forEach((student, index) => {
-        const el = document.createElement("div");
-        el.className = "student-pill tier-" + student.tier;
+        const meta = getTierMeta(student.tier);
+
+        const pill = document.createElement("div");
+        pill.className = "student-pill " + meta.css;
+        pill.onclick = () => loadStudent(index);
+
+        const mainDiv = document.createElement("div");
+        mainDiv.className = "student-main";
 
         // Avatar icon if available
         if (student.avatar2d) {
           const img = document.createElement("img");
           img.src = student.avatar2d;
           img.alt = student.name + " avatar";
-          el.appendChild(img);
+          mainDiv.appendChild(img);
         }
 
-      const nameSpan = document.createElement("span");
-nameSpan.className = "student-name";
+        const textBlock = document.createElement("div");
+        textBlock.className = "student-text-block";
 
-// Tier badge mapping
-const badges = {
-  "S": "💎🔥",
-  "A": "🏅✨",
-  "B": "🥈⭐",
-  "C": "🥉",
-  "D": "⚫"
-};
-// Tier Badge + Name + XP
+        const nameLine = document.createElement("div");
+        nameLine.className = "student-name-line";
+        nameLine.textContent = `${meta.emoji} ${student.name}`;
 
-nameSpan.textContent = `${badges[student.tier] || ""} ${student.name}  (${student.xp} XP)`;
+        const tierLine = document.createElement("div");
+        tierLine.className = "student-tier-line";
+        tierLine.textContent = meta.label;
 
-        el.appendChild(nameSpan);
-        el.onclick = () => loadStudent(index);
-        list.appendChild(el);
+        textBlock.appendChild(nameLine);
+        textBlock.appendChild(tierLine);
+        mainDiv.appendChild(textBlock);
+
+        pill.appendChild(mainDiv);
+
+        // XP on the right
+        const xpSpan = document.createElement("div");
+        xpSpan.className = "student-xp";
+        xpSpan.textContent = `${isNaN(student.xp) ? 0 : student.xp} XP`;
+        pill.appendChild(xpSpan);
+
+        list.appendChild(pill);
       });
     }
 
     // When a student is clicked, load them into the 3D viewer + info panel
     function loadStudent(i) {
       const s = students[i];
+      const meta = getTierMeta(s.tier);
 
       const viewer = document.getElementById("avatarViewer");
       viewer.src = s.modelPath || "";
 
-      document.getElementById("infoName").textContent = s.name;
-      document.getElementById("infoTier").textContent = s.tier;
+      document.getElementById("infoName").textContent = `${meta.emoji} ${s.name}`;
+      document.getElementById("infoTierLine").textContent = `Tier: ${meta.label}`;
       document.getElementById("infoXP").textContent = isNaN(s.xp) ? "—" : s.xp;
       document.getElementById("infoPA").textContent = isNaN(s.paAvg) ? "—" : s.paAvg.toFixed(1);
       document.getElementById("infoNotes").textContent = s.notes || "—";
@@ -308,4 +430,3 @@ nameSpan.textContent = `${badges[student.tier] || ""} ${student.name}  (${studen
   </script>
 </body>
 </html>
-
